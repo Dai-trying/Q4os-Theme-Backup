@@ -1,0 +1,17 @@
+# This config file can be used to add extra files that wouldn't normally be included in the theme-backup, this is
+# primarily for custom themers who want to save their setup using this app. You can either use the full path to the
+# file or the relative path to the users home directory. Blank lines and lines beginning with # are ignored.
+# Examples
+#
+# /home/dai/.config/daithemebackup/config.file
+# .config/daithemebackup/config.file
+#
+# the following will fail
+#
+# config.file                                   (this does not exist in the home directory)
+# config/daithemebackup/config.file             (this is missing the . to denote hidden directory)
+# home/dai/.config/daithemebackup/config.file   (this is missing the / at the start and the script will add user path
+#                                                to the beginning, and then fail when it checks if it exists)
+
+.config/user-dirs.dirs
+.trinity/share/config/khotkeysrc

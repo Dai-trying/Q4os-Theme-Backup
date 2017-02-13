@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+#  Copyright 2016 by Dai Trying
+#
+#  This file is part of daithemebackup.
+#
+#     daithemebackup is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     daithemebackup is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with daithemebackup. If not, see <http://www.gnu.org/licenses/>.
+
+import tarfile
+import os
+from shutil import copyfile
+
+VERSION = "0.0.2-11"
+home = os.path.expanduser('~')
+my_dir = ".config/daithemebackup"
+full_path = os.path.join(home, my_dir)
+config_file = os.path.join(home, my_dir, 'config.file')
+file_name = "themebackup_"
+backup_file_name = ""
+
+if not os.path.isdir(full_path):
+    os.makedirs(full_path)
+if not os.path.exists(config_file):
+    copyfile('/usr/share/daithemebackup/config.file', config_file)
+
+
+def do_backup():
+    global backup_file_name
+    backup_file_name = ""
+    rf_list = []
+    all_files = []
+    with open(config_file) as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            if line.strip() == "":
+                continue
+            if not line.startswith('/home/'):
+                file_with_path = home + '/' + line.strip()
+            else:
+                file_with_path = line.strip()
+
+            if os.path.exists(file_with_path):
+                all_files.append(file_with_path)
+            else:
+                print(file_with_path + ' does not exist')
+
+    start_num = 1
+    tar = tarfile.open("/usr/share/apps/q4os_system/q4home.tar")
+    for tarinfo in tar:
+        this_file = os.path.join(home, tarinfo.name[2:])
+        if tarinfo.isreg():
+            if os.path.exists(this_file):
+                rf_list.append(this_file)
+    tar.close()
+
+    for new_file in all_files:
+        if new_file in rf_list:
+            pass
+        else:
+            rf_list.append(new_file)
+
+    while os.path.exists(os.path.join(full_path, file_name + "%03d" % start_num + ".tar.gz")):
+        start_num += 1
+    file_with_path = os.path.join(full_path, file_name + "%03d" % start_num + ".tar.gz")
+    backup_file_name = file_with_path
+    with tarfile.open(file_with_path, "w:gz") as tar:
+        for name in rf_list:
+                tar.add(name)
+
+
+def main():
+    do_backup()
+
+
+if __name__ == '__main__':
+    main()
